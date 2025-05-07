@@ -1,43 +1,68 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cat Feed</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
-</head>
-<body class="d-flex flex-column min-vh-100 pt-5">
-    <nav class="navbar navbar-expand-lg bg-black navbar-dark fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand p-2 mx-auto" href="#">Cat Feed</a>
-        </div>
-    </nav>
-    
-    <main id="app" class="container flex-grow-1 mt-4">
-        <div id="masonry">
-            <div class="column" v-for="(col, ci) in columns" :key="ci">
-                <div class="card" v-for="(item, i) in col" :key="item.id + '-' + i">
-                    <div v-if="item.skeleton" class="skeleton"></div>
-                    <img v-else :src="item.url" @load="item.loaded = true" :class="{ loaded: item.loaded }" alt="Котик"/>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Cat Feed</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="styles.css" rel="stylesheet">
+    </head>
+    <body class="d-flex flex-column min-vh-100 pt-5">
+        <nav class="navbar navbar-expand-lg bg-black navbar-dark fixed-top">
+            <div class="container-fluid">
+                <a class="navbar-brand p-2 mx-auto" href="#">Cat Feed</a>
+            </div>
+        </nav>
+
+        <main id="app" class="container flex-grow-1 mt-4">
+            <div class="text-center mb-4">
+                <button class="btn btn-light shadow me-2" @click="showGreeting = !showGreeting">
+                    {{ showGreeting ? 'Скрыть приветствие' : 'Показать приветствие' }}
+                </button>
+                <button class="btn btn-light shadow me-2" @click="showQuote = !showQuote">
+                    {{ showQuote ? 'Скрыть цитату' : 'Показать цитату' }}
+                </button>
+            </div>
+            <div class="mb-4 text-center">
+                <async-cat-greeting v-if="showGreeting"></async-cat-greeting>
+                <async-cat-quote v-if="showQuote"></async-cat-quote>
+            </div>
+
+            <div class="text-center my-4">
+                <button class="btn btn-light shadow" @click="toggleGallery">
+                    {{ showGallery ? 'Скрыть галерею котиков' : 'Показать галерею котиков 🐾' }}
+                </button>
+            </div>
+            <div v-if="showGallery">
+                <div id="masonry">
+                    <div class="column" v-for="(col, ci) in columns" :key="ci">
+                        <div class="card" v-for="(item, i) in col" :key="item.id + '-' + i">
+                            <div v-if="item.skeleton" class="skeleton"></div>
+                            <img
+                                v-else
+                                :src="item.url"
+                                @load="item.loaded = true"
+                                :class="{ loaded: item.loaded }"
+                                alt="Котик"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center my-4">
+                    <button class="btn btn-light shadow" @click="loadMore" :disabled="loading">
+                        {{ loading ? 'Загрузка...' : 'Ещё котики 🐾' }}
+                    </button>
                 </div>
             </div>
-        </div>
-        <div class="text-center my-4">
-            <button class="btn btn-light shadow" @click="loadMore" :disabled="loading">
-                {{ loading ? 'Загрузка...' : 'Ещё котики 🐾' }}
-            </button>
-        </div>
-    </main>
+        </main>
 
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="app.js"></script>
-</body>
+        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+        <script src="app.js"></script>
 
-<footer class="bg-black py-3 mt-auto">
-    <div class="container text-center text-light">
-        <p>&copy; 2025 Cat Feed. Все права защищены.</p>
-    </div>
-</footer>
-
+        <footer class="bg-black py-3 mt-auto">
+            <div class="container text-center text-light">
+                <p>&copy; 2025 Cat Feed. Все права защищены.</p>
+            </div>
+        </footer>
+    </body>
 </html>

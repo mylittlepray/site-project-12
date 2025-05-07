@@ -1,45 +1,116 @@
-const { createApp, nextTick } = Vue;
+const { createApp, nextTick, defineAsyncComponent } = Vue;
 
 createApp({
     data() {
         return {
             columns: [],
-            loading: false
+            loading: false,
+            showGallery: false,
+            galleryInitialized: false,
+            showGreeting: false,
+            showQuote: false
         };
     },
+
+    components: {
+        AsyncCatGreeting: defineAsyncComponent({
+            loader: () => new Promise(resolve => {
+                setTimeout(() => {
+                    resolve({
+                        template: `
+                            <div class="alert alert-info">
+                                🐱 Привет от вашего любимого котика!
+                            </div>`
+                    });
+                }, 1500);
+            }),
+            loadingComponent: {
+                template: `
+                    <div class="d-flex justify-content-center my-2">
+                        <div class="text-light spinner-border text-info" role="status">
+                            <span class="visually-hidden">Загрузка...</span>
+                        </div>
+                    </div>`
+            },
+            errorComponent: {
+                template: `
+                    <div class="alert alert-danger">
+                        ❌ Не удалось загрузить приветствие.
+                    </div>`
+            },
+            delay: 200,
+            timeout: 5000
+        }),
+
+        AsyncCatQuote: defineAsyncComponent({
+            loader: () => new Promise(resolve => {
+                setTimeout(() => {
+                    resolve({
+                        template: `
+                            <div class="p-3 mb-3 border rounded">
+                                <blockquote class="blockquote mb-0 text-light">
+                                    <p>«Кошки — это художники: они скрашивают наши серые будни яркими пятнами»</p>
+                                    <footer class="blockquote-footer">Неизвестный автор</footer>
+                                </blockquote>
+                            </div>`
+                    });
+                }, 3000);
+            }),
+            loadingComponent: {
+                template: `
+                    <div class="alert alert-warning">
+                        Загружаем цитату…
+                    </div>`
+            },
+            errorComponent: {
+                template: `
+                    <div class="alert alert-danger">
+                        ❌ Не удалось загрузить цитату.
+                    </div>`
+            },
+            delay: 500,
+            timeout: 7000
+        })
+    },
+
     methods: {
+        toggleGallery() {
+            this.showGallery = !this.showGallery;
+            if (this.showGallery && !this.galleryInitialized) {
+                this.galleryInitialized = true;
+                this.initialLoad();
+            }
+        },
+
         getColCount() {
             const w = window.innerWidth;
             if (w >= 1200) return 4;
-            if (w >= 992) return 3;
-            if (w >= 768) return 2;
+            if (w >= 992)  return 3;
+            if (w >= 768)  return 2;
             return 1;
         },
-        
+
         initColumns() {
             const cnt = this.getColCount();
             this.columns = Array.from({ length: cnt }, () => []);
         },
-        
-        addSkeletons(count) {
-            const batchSkeletons = [];
 
+        addSkeletons(count) {
+            const batch = [];
             for (let i = 0; i < count; i++) {
                 const slot = { id: `sk-${Date.now()}-${i}`, skeleton: true };
-                batchSkeletons.push(slot);
+                batch.push(slot);
                 this.columns[i % this.columns.length].push(slot);
             }
-            
-            return batchSkeletons;
+            return batch;
         },
-        
-        async replaceSkeletons(batchSkeletons, catData) {
+
+        async replaceSkeletons(batch, data) {
             await nextTick();
-            
-            catData.forEach((cat, i) => {
-                const slot = batchSkeletons[i];
+            data.forEach((cat, i) => {
+                const slot = batch[i];
                 if (!slot) return;
-                
+
                 for (const col of this.columns) {
                     const idx = col.indexOf(slot);
                     if (idx !== -1) {
@@ -49,7 +120,7 @@ createApp({
                             skeleton: false,
                             loaded: false
                         });
-                        
+
                         const img = new Image();
                         img.src = cat.url;
                         img.onload = () => {
@@ -57,17 +128,14 @@ createApp({
                                 col[idx].loaded = true;
                             }, 100 + i * 50);
                         };
-                        
                         break;
                     }
                 }
             });
-            
-            const extra = batchSkeletons.length - catData.length;
+
+            const extra = batch.length - data.length;
             if (extra > 0) {
-                const toRemove = batchSkeletons.slice(catData.length);
-                toRemove.forEach(slot => {
-                    
+                batch.slice(data.length).forEach(slot => {
                     for (const col of this.columns) {
                         const idx = col.indexOf(slot);
                         if (idx !== -1) {
@@ -78,21 +146,18 @@ createApp({
                 });
             }
         },
-        
+
         async loadBatch(count) {
             this.loading = true;
-            const batchSkeletons = this.addSkeletons(count);
-            
+            const batch = this.addSkeletons(count);
+
             try {
-                const res = await fetch(`https://api.thecatapi.com/v1/images/search?limit=${count}`);
+                const res  = await fetch(`https://api.thecatapi.com/v1/images/search?limit=${count}`);
                 const data = await res.json();
-                
-                await this.replaceSkeletons(batchSkeletons, data);
-            } 
-            catch (e) {
+                await this.replaceSkeletons(batch, data);
+            } catch (e) {
                 console.error("Ошибка котиков:", e);
-                
-                batchSkeletons.forEach(slot => {
+                batch.forEach(slot => {
                     for (const col of this.columns) {
                         const idx = col.indexOf(slot);
                         if (idx !== -1) {
@@ -101,39 +166,34 @@ createApp({
                         }
                     }
                 });
-            } 
-            finally {
+            } finally {
                 this.loading = false;
             }
         },
-        
+
         async initialLoad() {
-            const h = window.innerHeight;
-            const avg = 300;
+            this.initColumns();
+            const h    = window.innerHeight;
+            const avg  = 300;
             const cols = this.getColCount();
-            const count = Math.ceil(h / avg) * cols * 2;
-            await this.loadBatch(count);
+            const cnt  = Math.ceil(h / avg) * cols * 2;
+            await this.loadBatch(cnt);
         },
-        
+
         loadMore() {
             if (!this.loading) {
                 this.loadBatch(this.getColCount() * 10);
             }
         }
     },
-    
+
     async mounted() {
-        this.initColumns();
-        await this.initialLoad();
-        
         window.addEventListener("resize", () => {
             const all = this.columns.flat();
             this.initColumns();
-            
             all.forEach((item, i) => {
                 this.columns[i % this.columns.length].push(item);
             });
         });
     }
-
 }).mount('#app');
