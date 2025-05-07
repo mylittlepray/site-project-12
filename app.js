@@ -111,7 +111,7 @@ createApp({
             const h = window.innerHeight;
             const avg = 300;
             const cols = this.getColCount();
-            const count = Math.ceil(h / avg) * cols;
+            const count = Math.ceil(h / avg) * cols * 2;
             await this.loadBatch(count);
         },
         
