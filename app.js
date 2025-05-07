@@ -117,7 +117,7 @@ createApp({
         
         loadMore() {
             if (!this.loading) {
-                this.loadBatch(this.getColCount() * 4);
+                this.loadBatch(this.getColCount() * 6);
             }
         }
     },
