@@ -42,8 +42,10 @@
                                 v-else
                                 :src="item.url"
                                 @load="item.loaded = true"
+                                @click="openModal(item.url)"
                                 :class="{ loaded: item.loaded }"
                                 alt="Котик"
+                                style="cursor: pointer;"
                             />
                         </div>
                     </div>
@@ -53,6 +55,11 @@
                         {{ loading ? 'Загрузка...' : 'Ещё котики 🐾' }}
                     </button>
                 </div>
+            </div>
+            
+            <div id="modal" class="modal" @click.self="closeModal" :class="{ show: showModal }">
+                <span class="close" @click="closeModal">&times;</span>
+                <img class="modal-content" :src="selectedImage" alt="Котик">
             </div>
         </main>
 

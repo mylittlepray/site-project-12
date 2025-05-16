@@ -8,7 +8,9 @@ createApp({
             showGallery: false,
             galleryInitialized: false,
             showGreeting: false,
-            showQuote: false
+            showQuote: false,
+            showModal: false,
+            selectedImage: ''
         };
     },
 
@@ -105,6 +107,16 @@ createApp({
             return batch;
         },
 
+        openModal(url) {
+            this.selectedImage = url;
+            this.showModal = true;
+        },
+
+        closeModal() {
+            this.showModal = false;
+            this.selectedImage = '';
+        },
+
         async replaceSkeletons(batch, data) {
             await nextTick();
             data.forEach((cat, i) => {
@@ -194,6 +206,12 @@ createApp({
             all.forEach((item, i) => {
                 this.columns[i % this.columns.length].push(item);
             });
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.showModal) {
+                this.closeModal();
+            }
         });
     }
 }).mount('#app');
