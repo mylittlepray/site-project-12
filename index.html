@@ -14,13 +14,16 @@
             </div>
         </nav>
 
-        <main id="app" class="container flex-grow-1 mt-4">
+        <main id="app" class="container flex-grow-1 p-4">
             <div class="text-center mb-4">
-                <button class="btn btn-light shadow me-2" @click="showGreeting = !showGreeting">
+                <button class="btn btn-light shadow m-2" @click="showGreeting = !showGreeting">
                     {{ showGreeting ? 'Скрыть приветствие' : 'Показать приветствие' }}
                 </button>
-                <button class="btn btn-light shadow me-2" @click="showQuote = !showQuote">
+                <button class="btn btn-light shadow m-2" @click="showQuote = !showQuote">
                     {{ showQuote ? 'Скрыть цитату' : 'Показать цитату' }}
+                </button>
+                <button class="btn btn-light shadow m-2" @click="toggleGallery">
+                    {{ showGallery ? 'Скрыть галерею котиков' : 'Показать галерею котиков 🐾' }}
                 </button>
             </div>
             <div class="mb-4 text-center">
@@ -28,10 +31,8 @@
                 <async-cat-quote v-if="showQuote"></async-cat-quote>
             </div>
 
-            <div class="text-center my-4">
-                <button class="btn btn-light shadow" @click="toggleGallery">
-                    {{ showGallery ? 'Скрыть галерею котиков' : 'Показать галерею котиков 🐾' }}
-                </button>
+            <div class="text-center m-4">
+
             </div>
             <div v-if="showGallery">
                 <div id="masonry">
