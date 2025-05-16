@@ -15,20 +15,20 @@
         </nav>
 
         <main id="app" class="container flex-grow-1 mt-4">
-            <div class="text-center m-4">
-                <button class="btn btn-light shadow m-2" @click="showGreeting = !showGreeting">
+            <div class="text-center mb-4">
+                <button class="btn btn-light shadow me-2" @click="showGreeting = !showGreeting">
                     {{ showGreeting ? 'Скрыть приветствие' : 'Показать приветствие' }}
                 </button>
-                <button class="btn btn-light shadow m-2" @click="showQuote = !showQuote">
+                <button class="btn btn-light shadow me-2" @click="showQuote = !showQuote">
                     {{ showQuote ? 'Скрыть цитату' : 'Показать цитату' }}
                 </button>
             </div>
-            <div class="m-4 text-center">
+            <div class="mb-4 text-center">
                 <async-cat-greeting v-if="showGreeting"></async-cat-greeting>
                 <async-cat-quote v-if="showQuote"></async-cat-quote>
             </div>
 
-            <div class="text-center m-4">
+            <div class="text-center my-4">
                 <button class="btn btn-light shadow" @click="toggleGallery">
                     {{ showGallery ? 'Скрыть галерею котиков' : 'Показать галерею котиков 🐾' }}
                 </button>
@@ -45,7 +45,7 @@
                                 @click="openModal(item.url)"
                                 :class="{ loaded: item.loaded }"
                                 alt="Котик"
-                                style="cursor: pointer;"
+                                
                             />
                         </div>
                     </div>

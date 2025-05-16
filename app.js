@@ -116,7 +116,7 @@ createApp({
             this.showModal = false;
             setTimeout(() => {
                 this.selectedImage = '';
-            }, 250);
+            }, 400);
         },
 
         async replaceSkeletons(batch, data) {
